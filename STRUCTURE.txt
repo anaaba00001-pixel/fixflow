@@ -1,0 +1,30 @@
+fixflow-project-skeleton/
+├── public/
+├── src/
+│   ├── assets/
+│   ├── components/
+│   ├── pages/
+│   ├── layouts/
+│   ├── routes/
+│   ├── services/
+│   ├── lib/
+│   ├── hooks/
+│   ├── context/
+│   ├── utils/
+│   ├── constants/
+│   ├── styles/
+│   ├── types/
+│   ├── App.jsx
+│   └── main.jsx
+├── supabase/
+│   ├── migrations/
+│   └── functions/
+├── docs/
+├── tests/
+├── scripts/
+├── .env.example
+├── .gitignore
+├── index.html
+├── package.json
+├── vite.config.js
+└── README.md
