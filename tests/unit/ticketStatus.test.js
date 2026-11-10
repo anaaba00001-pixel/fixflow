@@ -13,10 +13,19 @@ describe("ticket status workflow", () => {
     expect(canTransition("IN_PROGRESS", "WAITING_PARTS")).toBe(true);
     expect(canTransition("WAITING_PARTS", "IN_PROGRESS")).toBe(true);
     expect(canTransition("CLOSED", "REOPENED")).toBe(true);
+    expect(canTransition("PENDING_APPROVAL", "REOPENED")).toBe(true);
+    expect(canTransition("REOPENED", "IN_PROGRESS")).toBe(true);
+    expect(canTransition("CANCELLED", "NEW")).toBe(true);
   });
   it("rejects skipped and unknown transitions", () => {
     expect(canTransition("NEW", "CLOSED")).toBe(false);
     expect(() => assertTransition("NEW", "CLOSED")).toThrow("INVALID_STATUS_TRANSITION");
     expect(canTransition("UNKNOWN", "NEW")).toBe(false);
+  });
+  it("uses the same recovery transitions as the database", () => {
+    expect(canTransition("ASSIGNED", "NEW")).toBe(true);
+    expect(canTransition("ASSIGNED", "ASSIGNED")).toBe(false);
+    expect(canTransition("PENDING_APPROVAL", "REOPENED")).toBe(true);
+    expect(canTransition("CANCELLED", "NEW")).toBe(true);
   });
 });

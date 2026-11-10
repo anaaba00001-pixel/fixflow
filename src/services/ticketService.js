@@ -29,13 +29,44 @@ export async function getTicket(id) {
 }
 
 export async function createPublicTicket(payload) {
-  const validation = validateTicketInput({ assetId: payload.assetId ?? payload.asset_id, description: payload.description, priority: payload.priority });
-  if (!validation.valid) throw new Error(Object.values(validation.errors)[0]);
-  return unwrap(await requireSupabase().functions.invoke("public-ticket", { body: payload }));
+  const action = String(payload?.action || "create").trim().toLowerCase();
+  const body = { ...payload, action };
+
+  if (action === "create") {
+    const validation = validateTicketInput({
+      assetId: body.assetId ?? body.asset_id,
+      description: body.description,
+      priority: body.priority,
+    });
+    if (!validation.valid) throw new Error(Object.values(validation.errors)[0]);
+  } else if (["track", "confirm_resolution", "reopen", "rate"].includes(action)) {
+    if (!(body.trackingToken ?? body.tracking_token)) {
+      throw new Error("TRACKING_TOKEN_REQUIRED");
+    }
+  } else if (action === "resolve_asset") {
+    if (!(body.qrToken ?? body.qr_token)) throw new Error("INVALID_QR");
+  } else {
+    throw new Error(`UNSUPPORTED_PUBLIC_TICKET_ACTION:${action}`);
+  }
+
+  return unwrap(await requireSupabase().functions.invoke("public-ticket", { body }));
 }
 
 export async function createTicket(payload) {
-  return createPublicTicket({ ...payload, source: "REGISTERED_REPORTER" });
+  const validation = validateTicketInput({
+    assetId: payload.assetId ?? payload.asset_id,
+    description: payload.description,
+    priority: payload.priority,
+  });
+  // Registered reporters may create a general ticket without an asset.
+  if (validation.errors.assetId) delete validation.errors.assetId;
+  if (Object.keys(validation.errors).length) {
+    throw new Error(Object.values(validation.errors)[0]);
+  }
+  const result = unwrap(await requireSupabase().functions.invoke("registered-ticket", {
+    body: { ...payload, action: "create" },
+  }));
+  return result?.data || result;
 }
 
 export async function assignTechnician(ticketId, technicianId, note = null) {
@@ -48,6 +79,13 @@ export async function changeStatus(ticketOrId, nextStatus, reason = null) {
   return unwrap(await requireSupabase().rpc("change_ticket_status", { p_ticket_id: ticket.id, p_new_status: nextStatus, p_reason: reason }));
 }
 
+export async function approveTicketResolution(ticketId, note = null) {
+  return unwrap(await requireSupabase().rpc("approve_ticket_resolution", {
+    p_ticket_id: ticketId,
+    p_note: note,
+  }));
+}
+
 export async function uploadTicketAttachment(ticketId, file, type = "REPORT", organizationId) {
   const validation = validateImage(file);
   if (!validation.valid) throw new Error(validation.error);
@@ -56,7 +94,13 @@ export async function uploadTicketAttachment(ticketId, file, type = "REPORT", or
   const client = requireSupabase();
   const upload = await client.storage.from("ticket-attachments").upload(path, file, { contentType: file.type, upsert: false });
   if (upload.error) throw upload.error;
-  const attachment = await client.from("ticket_attachments").insert({ organization_id: organizationId, ticket_id: ticketId, storage_path: path, type, mime_type: file.type, size_bytes: file.size }).select().single();
+  const { data: authData } = await client.auth.getUser();
+  const uploadedBy = authData?.user?.id;
+  if (!uploadedBy) {
+    await client.storage.from("ticket-attachments").remove([path]);
+    throw new Error("UNAUTHENTICATED");
+  }
+  const attachment = await client.from("ticket_attachments").insert({ organization_id: organizationId, ticket_id: ticketId, storage_path: path, type, mime_type: file.type, size_bytes: file.size, uploaded_by: uploadedBy }).select().single();
   if (attachment.error) {
     await client.storage.from("ticket-attachments").remove([path]);
     throw attachment.error;

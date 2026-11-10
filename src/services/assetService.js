@@ -671,6 +671,14 @@ export async function createAsset(
     throw enhanceAssetError(error);
   }
 
+  const storedToken = await requireSupabase().functions.invoke("asset-qr", {
+    body: { action: "store", assetId: data.id, qrToken },
+  });
+  if (storedToken.error) {
+    await requireSupabase().from("assets").delete().eq("id", data.id);
+    throw enhanceAssetError(storedToken.error);
+  }
+
   return {
     asset: {
       ...data,
@@ -838,32 +846,13 @@ export async function regenerateAssetQr(
     );
   }
 
-  const qrToken =
-    createRandomToken();
-
-  const qrTokenHash =
-    await hashToken(qrToken);
-
-  const { data, error } =
-    await requireSupabase()
-      .from("assets")
-      .update({
-        qr_token_hash:
-          qrTokenHash,
-
-        is_active:
-          true,
-
-        updated_at:
-          new Date().toISOString(),
-      })
-      .eq("id", assetId)
-      .select(ASSET_SELECT)
-      .single();
-
-  if (error) {
-    throw enhanceAssetError(error);
-  }
+  const { data: tokenData, error } = await requireSupabase().functions.invoke(
+    "asset-qr",
+    { body: { action: "rotate", assetId } }
+  );
+  if (error) throw enhanceAssetError(error);
+  const data = await getAsset(assetId);
+  const qrToken = tokenData?.qrToken;
 
   return {
     asset: {
@@ -882,6 +871,16 @@ export async function regenerateAssetQr(
         qrToken
       ),
   };
+}
+
+export async function getAssetQrToken(assetId) {
+  if (!assetId) throw new Error("ASSET_ID_REQUIRED");
+  const { data, error } = await requireSupabase().functions.invoke("asset-qr", {
+    body: { action: "reveal", assetId },
+  });
+  if (error) throw enhanceAssetError(error);
+  if (!data?.qrToken) throw new Error(data?.error || "QR_TOKEN_NOT_RECOVERABLE");
+  return data.qrToken;
 }
 
 export async function disableAssetQr(

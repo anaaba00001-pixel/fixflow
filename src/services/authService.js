@@ -36,7 +36,7 @@ function getPasswordResetRedirectUrl() {
     return configuredUrl;
   }
 
-  return `${getApplicationUrl()}/login?mode=reset-password`;
+  return `${getApplicationUrl()}/reset-password`;
 }
 
 function validateEmail(email) {

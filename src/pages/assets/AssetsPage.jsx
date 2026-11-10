@@ -20,6 +20,7 @@ import {
 
 import {
   createAsset,
+  getAssetQrToken,
   listAssets,
   regenerateAssetQr,
   updateAsset,
@@ -1387,10 +1388,24 @@ export default function AssetsPage() {
      عرض وإنشاء رمز QR
   ================================================== */
 
-  function handleShowQr(asset) {
+  async function handleShowQr(asset) {
     setError("");
     setSuccessMessage("");
     setQrAsset(asset);
+    if (!isSupabaseConfigured || asset?.qr_token || asset?.qrToken) return;
+    setGeneratingQr(true);
+    try {
+      const qrToken = await getAssetQrToken(asset.id);
+      setQrAsset({ ...asset, qr_token: qrToken, qrToken });
+    } catch (qrError) {
+      setError(
+        qrError instanceof Error
+          ? qrError.message
+          : "تعذر استرجاع رمز QR الحالي."
+      );
+    } finally {
+      setGeneratingQr(false);
+    }
   }
 
   async function handleRegenerateQr() {

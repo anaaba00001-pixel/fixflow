@@ -1457,6 +1457,10 @@ async function confirmResolution(
     );
   }
 
+  if (!ticket.supervisor_approved_at) {
+    throw new Error("SUPERVISOR_APPROVAL_REQUIRED");
+  }
+
   const now =
     new Date().toISOString();
 
@@ -1468,6 +1472,15 @@ async function confirmResolution(
           "CLOSED",
 
         closed_at:
+          now,
+
+        first_closed_at:
+          ticket.first_closed_at || now,
+
+        last_closed_at:
+          now,
+
+        reporter_confirmed_at:
           now,
 
         updated_at:
@@ -1599,6 +1612,24 @@ async function reopenTicket(
           null,
 
         completed_at:
+          null,
+
+        reopened_at:
+          now,
+
+        reopen_count:
+          Number(ticket.reopen_count || 0) + 1,
+
+        current_cycle_started_at:
+          now,
+
+        supervisor_approved_at:
+          null,
+
+        supervisor_approved_by:
+          null,
+
+        reporter_confirmed_at:
           null,
 
         updated_at:

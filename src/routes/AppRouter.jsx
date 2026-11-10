@@ -6,6 +6,7 @@ import PublicLayout from "../layouts/PublicLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import LoginPage from "../pages/auth/LoginPage";
 import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "../pages/auth/ResetPasswordPage";
 import DashboardPage from "../pages/dashboard/DashboardPage";
 import TicketsPage from "../pages/tickets/TicketsPage";
 import TicketDetailsPage from "../pages/tickets/TicketDetailsPage";
@@ -54,6 +55,7 @@ export default function AppRouter() {
     const { path } = location;
     if (path === "/login") return <PublicLayout><LoginPage /></PublicLayout>;
     if (path === "/forgot-password") return <PublicLayout><ForgotPasswordPage /></PublicLayout>;
+    if (path === "/reset-password") return <PublicLayout><ResetPasswordPage /></PublicLayout>;
     if (path.startsWith("/request/")) return <PublicLayout><CreateRequestPage token={decodeURIComponent(path.slice(9))} /></PublicLayout>;
     if (path.startsWith("/track/")) return <PublicLayout><TrackRequestPage token={decodeURIComponent(path.slice(7))} /></PublicLayout>;
     if (path === "/reporter/new") return <PrivatePage allowedRoles={[ROLE.REGISTERED_REPORTER]}><CreateReporterTicketPage /></PrivatePage>;

@@ -285,7 +285,8 @@ export default function TrackRequestPage({ token = "" }) {
     null;
 
   const canConfirmResolution =
-    ticket?.status === "PENDING_APPROVAL";
+    ticket?.status === "PENDING_APPROVAL" &&
+    Boolean(ticket?.supervisor_approved_at);
 
   const canRate =
     ticket?.status === "CLOSED" &&

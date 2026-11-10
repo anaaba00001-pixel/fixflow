@@ -31,6 +31,8 @@ const DEMO_ASSET = {
   },
 };
 
+const DEMO_QR_TOKEN = "demo-asset-qr";
+
 const DEMO_CATEGORIES = [
   {
     id: "demo-category-ac",
@@ -318,6 +320,15 @@ export default function CreateRequestPage({
       }
 
       if (!isSupabaseConfigured) {
+        if (normalizedToken !== DEMO_QR_TOKEN) {
+          if (!cancelled) {
+            setPageError(
+              "رمز QR غير معروف في الوضع التجريبي. استخدم demo-asset-qr فقط للعرض المحلي."
+            );
+            setLoading(false);
+          }
+          return;
+        }
         if (!cancelled) {
           setAsset(DEMO_ASSET);
 

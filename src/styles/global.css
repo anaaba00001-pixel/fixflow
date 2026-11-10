@@ -14,9 +14,17 @@
 }
 
 * { box-sizing: border-box; }
-html { direction: rtl; background: #f5f7f6; }
+html {
+  direction: rtl;
+  background: #f5f7f6;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
 body { margin: 0; min-width: 320px; min-height: 100vh; background: #f5f7f6; }
-button, input, select, textarea { font: inherit; }
+button, input, select, textarea {
+  font: inherit;
+  line-height: 1.5;
+}
 button { cursor: pointer; }
 a { color: inherit; }
 
@@ -50,7 +58,19 @@ a { color: inherit; }
 .page-header p { margin: 0; color: var(--muted); font-size: 11px; }
 .page-header > button, .page-header > div:last-child { margin-right: auto; }
 
-.primary, .secondary, .danger-button { padding: 11px 16px; border-radius: 9px; border: 0; font-size: 11px; font-weight: 600; }
+.primary, .secondary, .danger-button {
+  min-width: 0;
+  min-height: 40px;
+  height: auto;
+  padding: 9px 16px;
+  border-radius: 9px;
+  border: 0;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.55;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 .primary { color: #fff; background: var(--green); box-shadow: 0 5px 14px #176c6226; }
 .primary:hover { background: #105a52; }
 .primary:disabled { opacity: .55; cursor: not-allowed; }
@@ -103,7 +123,19 @@ a { color: inherit; }
 .priority-طارئة, .priority-EMERGENCY { background: #d84f4f; }
 .priority-مرتفعة, .priority-HIGH { background: #ed924d; }
 .priority-متوسطة, .priority-MEDIUM { background: #d8aa36; }
-.badge, .priority-pill { padding: 5px 9px; border-radius: 14px; color: #317568; background: #e4f3ef; font-size: 8px; font-weight: 600; white-space: nowrap; text-align: center; }
+.badge, .priority-pill {
+  max-width: 100%;
+  padding: 5px 9px;
+  border-radius: 14px;
+  color: #317568;
+  background: #e4f3ef;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1.45;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
 .chevron { color: #a2aeac; font-size: 19px; }
 
 .public-shell { min-height: 100vh; display: flex; flex-direction: column; background: radial-gradient(circle at 15% 18%, #deeee9 0, transparent 32%), #f5f7f6; }
@@ -119,7 +151,14 @@ a { color: inherit; }
 .auth-card > p { margin: 0 0 18px; color: var(--muted); font-size: 10px; line-height: 1.8; }
 .auth-card form, .form-grid { display: grid; gap: 12px; }
 .auth-card label, .form-field { display: grid; gap: 7px; color: #40534f; font-size: 10px; font-weight: 600; }
-.auth-card input, .form-field input, .form-field select, .form-field textarea { width: 100%; padding: 11px; outline: 0; }
+.auth-card input, .form-field input, .form-field select, .form-field textarea {
+  width: 100%;
+  min-height: 42px;
+  height: auto;
+  padding: 10px 11px;
+  outline: 0;
+  line-height: 1.55;
+}
 .auth-card input:focus, input:focus, select:focus, textarea:focus { border-color: #2b887d; box-shadow: 0 0 0 3px #2b887d18; }
 .eyebrow { color: var(--green); font-size: 9px; font-weight: 700; }
 .demo-callout, .form-error { margin: 12px 0; padding: 11px 13px; border-radius: 9px; font-size: 9px; line-height: 1.7; }
@@ -803,5 +842,90 @@ button:focus-visible {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+}
+
+/* ==================================================
+   احتواء النصوص داخل الخانات والبطاقات
+================================================== */
+
+.page-header,
+.panel-head,
+.stat-card,
+.ticket-row,
+.asset-box,
+.public-card,
+.auth-card,
+.drawer,
+.create-modal,
+.modal-buttons,
+td,
+th {
+  min-width: 0;
+}
+
+.page-header h1,
+.panel-head h2,
+.stat-card strong,
+.ticket-main strong,
+.ticket-location strong,
+.asset-box strong,
+.public-card h1,
+.public-card h2,
+.auth-card h1,
+td,
+th {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.stat-card strong {
+  font-size: clamp(19px, 2.2vw, 27px);
+  line-height: 1.3;
+}
+
+select,
+input:not([type="checkbox"]):not([type="radio"]),
+textarea {
+  min-height: 42px;
+  height: auto;
+  padding-block: 9px;
+  line-height: 1.55;
+}
+
+textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.text-button,
+.link-button {
+  max-width: 100%;
+  min-height: 32px;
+  line-height: 1.5;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .primary,
+  .secondary,
+  .danger-button {
+    min-height: 44px;
+    padding-inline: 13px;
+  }
+
+  .panel-head {
+    flex-wrap: wrap;
+  }
+
+  .panel-head > button {
+    max-width: 100%;
+  }
+
+  .badge,
+  .priority-pill {
+    font-size: 7.5px;
   }
 }

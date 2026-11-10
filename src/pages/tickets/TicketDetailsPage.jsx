@@ -21,6 +21,7 @@ import {
 import { navigate } from "../../routes/AppRouter";
 
 import {
+  approveTicketResolution,
   assignTechnician,
   changeStatus,
   getTicket,
@@ -1539,11 +1540,14 @@ export default function TicketDetailsPage({
         );
       } else {
         const result =
-          await changeStatus(
-            ticket,
-            nextStatus,
-            note
-          );
+          decision === "APPROVE"
+            ? await approveTicketResolution(ticket.id, note)
+            : await changeStatus(ticket, nextStatus, note);
+
+        const effectiveStatus =
+          decision === "APPROVE"
+            ? "PENDING_APPROVAL"
+            : nextStatus;
 
         updatedTicket = {
           ...ticket,
@@ -1551,8 +1555,12 @@ export default function TicketDetailsPage({
             result ||
             {}),
 
-          status:
-            nextStatus,
+          status: effectiveStatus,
+
+          supervisor_approved_at:
+            decision === "APPROVE"
+              ? result?.supervisor_approved_at || new Date().toISOString()
+              : ticket.supervisor_approved_at,
 
           updated_at:
             new Date()
