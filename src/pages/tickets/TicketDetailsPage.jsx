@@ -19,6 +19,7 @@ import {
 } from "../../lib/supabase";
 
 import { navigate } from "../../routes/AppRouter";
+import { readLocalTickets, readLocalUsers } from "../../lib/localData";
 
 import {
   approveTicketResolution,
@@ -929,7 +930,7 @@ export default function TicketDetailsPage({
         !isSupabaseConfigured
       ) {
         const storedTicket =
-          readStoredTickets().find(
+          readLocalTickets().find(
             (item) =>
               String(item.id) ===
                 String(ticketId) ||
@@ -938,14 +939,10 @@ export default function TicketDetailsPage({
               ) === String(ticketId)
           );
 
-        let selectedTicket =
-          storedTicket ||
-          (ticketId
-            ? {
-                ...DEMO_TICKET,
-                id: ticketId,
-              }
-            : DEMO_TICKET);
+        if (!storedTicket) {
+          throw new Error("TICKET_NOT_FOUND");
+        }
+        let selectedTicket = storedTicket;
 
         /*
          * عند تجربة حساب المبلّغ،
@@ -1088,7 +1085,7 @@ export default function TicketDetailsPage({
         !isSupabaseConfigured
       ) {
         setTechnicians(
-          DEMO_TECHNICIANS
+          readLocalUsers().filter((item) => item.role === "TECHNICIAN")
         );
 
         return;

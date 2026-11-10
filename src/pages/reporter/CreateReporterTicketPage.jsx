@@ -13,6 +13,7 @@ import {
   isSupabaseConfigured,
   requireSupabase,
 } from "../../lib/supabase";
+import { readLocalAssets, readLocalLocations } from "../../lib/localData";
 import { navigate } from "../../routes/AppRouter";
 import { listAssets } from "../../services/assetService";
 import { listLocations } from "../../services/locationService";
@@ -221,8 +222,8 @@ export default function CreateReporterTicketPage() {
 
     try {
       if (!isSupabaseConfigured) {
-        setLocations(DEMO_LOCATIONS);
-        setAssets(DEMO_ASSETS);
+        setLocations(readLocalLocations());
+        setAssets(readLocalAssets());
         setCategories(DEMO_CATEGORIES);
         return;
       }
@@ -555,7 +556,6 @@ export default function CreateReporterTicketPage() {
     </>
   );
 }
-
 
 
 

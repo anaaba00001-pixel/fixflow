@@ -4,6 +4,7 @@ import EmptyState from "../../components/common/EmptyState";
 import CreateTicketForm from "../../components/forms/CreateTicketForm";
 
 import { isSupabaseConfigured } from "../../lib/supabase";
+import { readLocalAssets } from "../../lib/localData";
 import { navigate } from "../../routes/AppRouter";
 import { createPublicTicket } from "../../services/ticketService";
 
@@ -320,7 +321,10 @@ export default function CreateRequestPage({
       }
 
       if (!isSupabaseConfigured) {
-        if (normalizedToken !== DEMO_QR_TOKEN) {
+        const localAsset = readLocalAssets().find((item) =>
+          String(item.qr_token || item.qrToken || "") === normalizedToken
+        );
+        if (!localAsset) {
           if (!cancelled) {
             setPageError(
               "رمز QR غير معروف في الوضع التجريبي. استخدم demo-asset-qr فقط للعرض المحلي."
@@ -330,7 +334,7 @@ export default function CreateRequestPage({
           return;
         }
         if (!cancelled) {
-          setAsset(DEMO_ASSET);
+          setAsset(localAsset);
 
           setCategories(
             DEMO_CATEGORIES

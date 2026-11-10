@@ -191,6 +191,15 @@ a { color: inherit; }
   .public-content { padding: 24px 13px !important; }
   .auth-card { padding: 24px; }
 }
+
+.first-run-setup { margin-bottom: 18px; padding-bottom: 18px; }
+.setup-steps { padding: 0 18px; display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 8px; }
+.setup-step { min-width: 0; padding: 12px 8px; display: grid; place-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); }
+.setup-step.complete { border-color: #b9ddd4; background: #edf7f4; color: var(--green); }
+.setup-step strong { font-size: 9px; text-align: center; overflow-wrap: anywhere; }
+.setup-name-form { margin: 14px 18px 0; padding: 14px; display: grid; gap: 10px; border-radius: 10px; background: #f7faf9; }
+.setup-name-form label { display: grid; gap: 7px; font-size: 10px; font-weight: 600; }
+@media (max-width: 760px) { .setup-steps { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 430px) {
   .stats-grid { grid-template-columns: 1fr; }
   .page-header h1 { font-size: 20px; }

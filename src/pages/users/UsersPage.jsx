@@ -16,6 +16,7 @@ import {
 } from "../../constants/roles";
 
 import useAuth from "../../hooks/useAuth";
+import { readLocalLocations, readLocalUsers, saveLocalUsers } from "../../lib/localData";
 
 import {
   isSupabaseConfigured,
@@ -334,42 +335,12 @@ function addLocationNames(
 }
 
 function readStoredUsers() {
-  try {
-    const storedValue =
-      localStorage.getItem(
-        STORAGE_KEY
-      );
-
-    if (!storedValue) {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(
-          DEMO_USERS
-        )
-      );
-
-      return DEMO_USERS;
-    }
-
-    const parsedValue =
-      JSON.parse(storedValue);
-
-    return Array.isArray(
-      parsedValue
-    )
-      ? parsedValue
-      : DEMO_USERS;
-  } catch {
-    return DEMO_USERS;
-  }
+  return readLocalUsers();
 }
 
 function saveStoredUsers(users) {
   try {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(users)
-    );
+    saveLocalUsers(users);
 
     return true;
   } catch {
@@ -619,13 +590,16 @@ export default function UsersPage() {
           ) {
             const storedUsers =
               readStoredUsers();
+            const storedLocations = readLocalLocations();
 
             setOrganizations(
-              DEMO_ORGANIZATIONS
+              DEMO_ORGANIZATIONS.filter((item) =>
+                !organizationId || String(item.id) === String(organizationId)
+              ).slice(0, 1)
             );
 
             setLocations(
-              DEMO_LOCATIONS
+              storedLocations
             );
 
             setUsers(
@@ -633,7 +607,7 @@ export default function UsersPage() {
                 (storedUser) =>
                   addLocationNames(
                     storedUser,
-                    DEMO_LOCATIONS
+                    storedLocations
                   )
               )
             );

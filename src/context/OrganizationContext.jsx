@@ -13,6 +13,7 @@ import {
   isSupabaseConfigured,
   requireSupabase,
 } from "../lib/supabase";
+import { readWorkspace } from "../lib/localData";
 
 /* ==================================================
    Context
@@ -97,6 +98,7 @@ function createDemoOrganization(
     {
       ...DEMO_ORGANIZATION,
       id: organizationId,
+      name: readWorkspace().name || "منشأتي",
     },
     organizationId
   );

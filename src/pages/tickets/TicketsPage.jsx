@@ -10,6 +10,7 @@ import TicketFilters from "../../components/tickets/TicketFilters";
 import TicketPriorityBadge from "../../components/tickets/TicketPriorityBadge";
 import TicketStatusBadge from "../../components/tickets/TicketStatusBadge";
 import useAuth from "../../hooks/useAuth";
+import { readLocalLocations, readLocalTickets, readLocalUsers } from "../../lib/localData";
 
 import {
   isSupabaseConfigured,
@@ -800,11 +801,13 @@ export default function TicketsPage() {
         isDemo ||
         !isSupabaseConfigured
       ) {
+        const localLocations = readLocalLocations();
+        const localTechnicians = readLocalUsers().filter((item) => item.role === "TECHNICIAN");
         const allowedDemoLocations =
           role ===
             "BRANCH_MANAGER" &&
           primaryLocationId
-            ? DEMO_LOCATIONS.filter(
+            ? localLocations.filter(
                 (location) =>
                   String(
                     location.id
@@ -817,7 +820,7 @@ export default function TicketsPage() {
                   "SUPERVISOR" &&
                 userLocationIds.length >
                   0
-              ? DEMO_LOCATIONS.filter(
+              ? localLocations.filter(
                   (location) =>
                     userLocationIds.includes(
                       String(
@@ -825,7 +828,7 @@ export default function TicketsPage() {
                       )
                     )
                 )
-              : DEMO_LOCATIONS;
+              : localLocations;
 
         setLocations(
           allowedDemoLocations
@@ -836,7 +839,7 @@ export default function TicketsPage() {
         );
 
         setTechnicians(
-          DEMO_TECHNICIANS
+          localTechnicians
         );
 
         return;
@@ -1031,15 +1034,11 @@ export default function TicketsPage() {
             isDemo ||
             !isSupabaseConfigured
           ) {
-            const storedTickets =
-              readStoredTickets();
+            const storedTickets = readLocalTickets();
 
             let nextTickets =
               removeDuplicateTickets(
-                [
-                  ...storedTickets,
-                  ...DEMO_TICKETS,
-                ]
+                storedTickets
               );
 
             if (

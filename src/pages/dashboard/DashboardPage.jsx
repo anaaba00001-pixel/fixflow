@@ -7,6 +7,7 @@ import {
 
 import EmptyState from "../../components/common/EmptyState";
 import Loader from "../../components/common/Loader";
+import FirstRunSetup from "../../components/dashboard/FirstRunSetup";
 
 import {
   PRIORITY_LABELS,
@@ -17,10 +18,12 @@ import {
 } from "../../constants/ticketStatuses";
 
 import useAuth from "../../hooks/useAuth";
+import useOrganization from "../../hooks/useOrganization";
 
 import {
   isSupabaseConfigured,
 } from "../../lib/supabase";
+import { createLocalDashboard } from "../../lib/localData";
 
 import {
   navigate,
@@ -885,6 +888,7 @@ export default function DashboardPage() {
     isPlatformAdmin,
     isDemo,
   } = useAuth();
+  const { organization, refreshOrganization } = useOrganization();
 
   const role = normalizeRole(
     authRole || user?.role
@@ -942,11 +946,10 @@ export default function DashboardPage() {
                 )
             );
 
-            setDashboard(
-              createDemoDashboard(
-                role
-              )
-            );
+            setDashboard(createLocalDashboard({
+              organizationId: isPlatformAdmin ? null : organizationId,
+              locationId: role === "BRANCH_MANAGER" ? primaryLocationId : null,
+            }));
 
             return;
           }
@@ -1349,6 +1352,14 @@ export default function DashboardPage() {
         </div>
       ) : null}
 
+      {role === "ORGANIZATION_ADMIN" ? (
+        <FirstRunSetup
+          organization={organization}
+          organizationId={organizationId}
+          onOrganizationSaved={refreshOrganization}
+        />
+      ) : null}
+
       {/* رسالة الخطأ */}
       {error ? (
         <section
@@ -1709,11 +1720,9 @@ export default function DashboardPage() {
                 </b>
 
                 <em>
-                  {Math.max(
-                    100 -
-                      usedPercentage,
-                    0
-                  )}
+                  {totalTickets === 0
+                    ? 0
+                    : Math.max(100 - usedPercentage, 0)}
                   %
                 </em>
               </p>

@@ -30,7 +30,7 @@ const DEMO_USERS = Object.freeze({
   "admin@fixflow.demo": {
     id: "demo-organization-admin",
     email: "admin@fixflow.demo",
-    full_name: "نورة الناصر",
+    full_name: "مدير المنشأة",
     phone: "0500000002",
     role: "ORGANIZATION_ADMIN",
     organization_id: "demo-organization",

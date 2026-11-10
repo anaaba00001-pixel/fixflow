@@ -15,6 +15,7 @@ import {
   isSupabaseConfigured,
   requireSupabase,
 } from "../../lib/supabase";
+import { createLocalReport, readLocalLocations, readLocalUsers } from "../../lib/localData";
 
 import {
   exportReport,
@@ -846,11 +847,11 @@ export default function ReportsPage() {
           !isSupabaseConfigured
         ) {
           setLocations(
-            DEMO_LOCATIONS
+            readLocalLocations()
           );
 
           setTechnicians(
-            DEMO_TECHNICIANS
+            readLocalUsers().filter((item) => item.role === "TECHNICIAN")
           );
 
           return;
@@ -1002,7 +1003,7 @@ export default function ReportsPage() {
             !isSupabaseConfigured
           ) {
             setReport(
-              DEMO_REPORT
+              createLocalReport(scopedFilters)
             );
 
             return;
@@ -1186,7 +1187,7 @@ export default function ReportsPage() {
               isDemo ||
               !isSupabaseConfigured
                 ? report ||
-                  DEMO_REPORT
+                  createLocalReport(scopedFilters)
                 : undefined,
           });
 

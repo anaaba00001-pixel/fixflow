@@ -11,6 +11,7 @@ import TicketStatusBadge from "../../components/tickets/TicketStatusBadge";
 
 import { useAuth } from "../../hooks/useAuth";
 import { isSupabaseConfigured } from "../../lib/supabase";
+import { readLocalTickets } from "../../lib/localData";
 import { navigate } from "../../routes/AppRouter";
 import { listTickets } from "../../services/ticketService";
 import { formatDate } from "../../utils/formatDate";
@@ -316,13 +317,7 @@ export default function ReporterDashboardPage() {
          * وضع العرض التجريبي.
          */
         if (!isSupabaseConfigured) {
-          const storedTickets =
-            readStoredReporterTickets(user);
-
-          const demoTickets = [
-            ...storedTickets,
-            ...DEMO_REPORTER_TICKETS,
-          ];
+          const demoTickets = readLocalTickets().filter((ticket) => isReporterTicket(ticket, user));
 
           const uniqueTickets = new Map();
 

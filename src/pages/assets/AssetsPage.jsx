@@ -12,6 +12,7 @@ import EmptyState from "../../components/common/EmptyState";
 import Modal from "../../components/common/Modal";
 
 import useAuth from "../../hooks/useAuth";
+import { readLocalAssets, readLocalLocations, saveLocalAssets } from "../../lib/localData";
 
 import {
   isSupabaseConfigured,
@@ -491,38 +492,12 @@ function addRelations(
 }
 
 function readStoredAssets() {
-  try {
-    const storedValue =
-      localStorage.getItem(
-        ASSETS_STORAGE_KEY
-      );
-
-    if (!storedValue) {
-      localStorage.setItem(
-        ASSETS_STORAGE_KEY,
-        JSON.stringify(DEMO_ASSETS)
-      );
-
-      return DEMO_ASSETS;
-    }
-
-    const parsedValue =
-      JSON.parse(storedValue);
-
-    return Array.isArray(parsedValue)
-      ? parsedValue
-      : DEMO_ASSETS;
-  } catch {
-    return DEMO_ASSETS;
-  }
+  return readLocalAssets();
 }
 
 function saveStoredAssets(assets) {
   try {
-    localStorage.setItem(
-      ASSETS_STORAGE_KEY,
-      JSON.stringify(assets)
-    );
+    saveLocalAssets(assets);
 
     return true;
   } catch {
@@ -694,16 +669,17 @@ export default function AssetsPage() {
           ) {
             const storedAssets =
               readStoredAssets();
+            const storedLocations = readLocalLocations();
 
             const scopedLocations =
               allowedLocationIds.length > 0
-                ? DEMO_LOCATIONS.filter(
+                ? storedLocations.filter(
                     (location) =>
                       allowedLocationIds.includes(
                         String(location.id)
                       )
                   )
-                : DEMO_LOCATIONS;
+                : storedLocations;
 
             const scopedLocationIds =
               scopedLocations.map(
@@ -729,7 +705,7 @@ export default function AssetsPage() {
               scopedAssets.map((asset) =>
                 addRelations(
                   asset,
-                  DEMO_LOCATIONS,
+                  storedLocations,
                   DEMO_CATEGORIES
                 )
               )

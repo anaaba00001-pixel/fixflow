@@ -10,6 +10,7 @@ import TicketPriorityBadge from "../../components/tickets/TicketPriorityBadge";
 import TicketStatusBadge from "../../components/tickets/TicketStatusBadge";
 
 import useAuth from "../../hooks/useAuth";
+import { readLocalTickets } from "../../lib/localData";
 
 import {
   isSupabaseConfigured,
@@ -747,14 +748,10 @@ export default function MyTicketsPage() {
             isDemo ||
             !isSupabaseConfigured
           ) {
-            const storedTickets =
-              readStoredTickets();
+            const storedTickets = readLocalTickets();
 
             const combinedTickets =
-              removeDuplicateTickets([
-                ...storedTickets,
-                ...DEMO_TICKETS,
-              ]);
+              removeDuplicateTickets(storedTickets);
 
             const technicianTickets =
               combinedTickets.filter(

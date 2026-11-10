@@ -157,13 +157,6 @@ function getDemoTicket(trackingToken) {
     return storedTicket;
   }
 
-  if (
-    trackingToken === "demo-tracking-token" ||
-    trackingToken === "demo"
-  ) {
-    return DEMO_TICKET;
-  }
-
   return null;
 }
 
@@ -180,15 +173,7 @@ function updateDemoTicket(trackingToken, changes) {
   );
 
   if (ticketIndex === -1) {
-    const updatedDemoTicket = {
-      ...DEMO_TICKET,
-      ...changes,
-      tracking_token: trackingToken,
-    };
-
-    saveDemoTickets([updatedDemoTicket, ...tickets]);
-
-    return updatedDemoTicket;
+    throw new Error("TRACKING_TOKEN_NOT_FOUND");
   }
 
   const updatedTicket = {

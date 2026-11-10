@@ -11,6 +11,7 @@ import LocationCard from "../../components/locations/LocationCard";
 import LocationForm from "../../components/locations/LocationForm";
 
 import useAuth from "../../hooks/useAuth";
+import { readLocalLocations, saveLocalLocations } from "../../lib/localData";
 
 import {
   isSupabaseConfigured,
@@ -226,36 +227,12 @@ function normalizeLocation(location) {
 }
 
 function readStoredLocations() {
-  try {
-    const storedValue =
-      localStorage.getItem(STORAGE_KEY);
-
-    if (!storedValue) {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(DEFAULT_LOCATIONS)
-      );
-
-      return DEFAULT_LOCATIONS;
-    }
-
-    const parsedValue =
-      JSON.parse(storedValue);
-
-    return Array.isArray(parsedValue)
-      ? parsedValue
-      : DEFAULT_LOCATIONS;
-  } catch {
-    return DEFAULT_LOCATIONS;
-  }
+  return readLocalLocations();
 }
 
 function saveStoredLocations(locations) {
   try {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(locations)
-    );
+    saveLocalLocations(locations);
 
     return true;
   } catch {
@@ -386,7 +363,9 @@ export default function LocationsPage() {
               .map(normalizeLocation);
 
           setOrganizations(
-            DEMO_ORGANIZATIONS
+            DEMO_ORGANIZATIONS.filter((item) =>
+              !organizationId || String(item.id) === String(organizationId)
+            ).slice(0, 1)
           );
 
           let scopedLocations =

@@ -156,4 +156,3 @@ export function useOrganization() {
 }
 
 export default useOrganization;
-useTickets.js

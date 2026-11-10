@@ -6,6 +6,7 @@ import EmptyState from "../../components/common/EmptyState";
 import Modal from "../../components/common/Modal";
 
 import useAuth from "../../hooks/useAuth";
+import { readLocalLocations } from "../../lib/localData";
 
 import {
   isSupabaseConfigured,
@@ -250,15 +251,16 @@ export default function CreateAssetPage() {
           isDemo ||
           !isSupabaseConfigured
         ) {
+          const storedLocations = readLocalLocations();
           const scopedLocations =
             allowedLocationIds.length > 0
-              ? DEMO_LOCATIONS.filter(
+              ? storedLocations.filter(
                   (location) =>
                     allowedLocationIds.includes(
                       String(location.id)
                     )
                 )
-              : DEMO_LOCATIONS;
+              : storedLocations;
 
           if (!cancelled) {
             setLocations(
